@@ -1,0 +1,284 @@
+<?php
+    namespace App\Http\Controllers\Backend;
+
+    use App\Http\Controllers\Controller;
+    use App\Http\Requests\{{model}}Request;
+    use Illuminate\Support\Facades\DB;
+    use App\Services\{{model}}Service;
+    use Illuminate\Http\Request;
+    use Illuminate\Support\Str;
+    use Illuminate\Support\Facades\Schema;
+    use Inertia\Inertia;
+    use App\Traits\SystemTrait;
+    use Exception;
+
+    class {{model}}Controller extends Controller
+    {
+        use SystemTrait;
+
+        protected ${{variable}}Service;
+
+        public function __construct({{model}}Service ${{variable}}Service)
+        {
+            $this->{{variable}}Service = ${{variable}}Service;
+        }
+
+        public function index()
+        {
+            return Inertia::render(
+                'Backend/{{model}}/Index',
+                [
+                    'pageTitle' => fn () => '{{model}} List',
+                    'breadcrumbs' => fn () => [
+                        ['link' => null, 'title' => '{{model}} Manage'],
+                        ['link' => route('backend.{{routeName}}.index'), 'title' => '{{model}} List'],
+                    ],
+                    'tableHeaders' => fn () => $this->getTableHeaders(),
+                    'dataFields' => fn () => $this->getDataFields(),
+                    'datas' => fn () => $this->getDatas(),
+                ]
+            );
+        }
+
+    private function getDataFields()
+    {
+        return [
+            ['fieldName' => 'index', 'class' => 'text-center'],
+            {{dataFields}},
+            ['fieldName' => 'status', 'class' => 'text-center'],
+        ];
+    }
+    private function getTableHeaders()
+    {
+        return [
+            'Sl/No',
+            {{tableHeaders}},
+            'Status',
+            'Action'
+        ];
+    }
+
+    private function getDatas()
+    {
+        $query = $this->{{variable}}Service->list();
+
+        {{dataFilters}}
+
+        $datas = $query->paginate(request()->numOfData ?? 10)->withQueryString();
+
+        $formatedDatas = $datas->map(function ($data, $index) {
+            $customData = new \stdClass();
+            $customData->index = $index + 1;
+
+            {{customDatas}}
+
+            $customData->status = getStatusText($data->status);
+            $customData->hasLink = true;
+            $customData->links = [
+
+                  [
+                    'linkClass' => 'semi-bold text-white statusChange ' . (($data->status == 'Active') ? "bg-gray-500" : "bg-green-500"),
+                    'link' => route('backend.{{routeName}}.status.change', ['id' => $data->id, 'status' => $data->status == 'Active' ? 'Inactive' : 'Active']),
+                    'linkLabel' => getLinkLabel((($data->status == 'Active') ? "Inactive" : "Active"), null, null)
+                ],
+
+                [
+                    'linkClass' => 'bg-yellow-400 text-black semi-bold',
+                    'link' => route('backend.{{routeName}}.edit', $data->id),
+                    'linkLabel' => getLinkLabel('Edit', null, null)
+                ],
+                [
+                    'linkClass' => 'deleteButton bg-red-500 text-white semi-bold',
+                    'link' => route('backend.{{routeName}}.destroy', $data->id),
+                    'linkLabel' => getLinkLabel('Delete', null, null)
+                ]
+            ];
+            return $customData;
+        });
+
+        return regeneratePagination($formatedDatas, $datas->total(), $datas->perPage(), $datas->currentPage());
+    }
+
+        public function create()
+        {
+            return Inertia::render(
+                'Backend/{{model}}/Form',
+                [
+                    'pageTitle' => fn () => '{{model}} Create',
+                    'breadcrumbs' => fn () => [
+                        ['link' => null, 'title' => '{{model}} Manage'],
+                        ['link' => route('backend.{{routeName}}.create'), 'title' => '{{model}} Create'],
+                    ],
+                ]
+            );
+        }
+
+
+        public function store({{model}}Request $request)
+        {
+
+            DB::beginTransaction();
+            try {
+
+                $data = $request->validated();
+
+                $dataInfo = $this->{{variable}}Service->create($data);
+
+                if ($dataInfo) {
+                    $message = '{{model}} created successfully';
+                    $this->storeAdminWorkLog($dataInfo->id, '{{table}}', $message);
+
+                    DB::commit();
+
+                    return redirect()
+                        ->back()
+                        ->with('successMessage', $message);
+                } else {
+                    DB::rollBack();
+
+                    $message = "Failed To create {{model}}.";
+                    return redirect()
+                        ->back()
+                        ->with('errorMessage', $message);
+                }
+            } catch (Exception $err) {
+
+                DB::rollBack();
+                $this->storeSystemError('Backend', '{{model}}Controller', 'store', substr($err->getMessage(), 0, 1000));
+
+                DB::commit();
+                $message = "Server Errors Occur. Please Try Again.";
+
+                return redirect()
+                    ->back()
+                    ->with('errorMessage', $message);
+            }
+        }
+
+        public function edit($id)
+        {
+            ${{routeName}} = $this->{{variable}}Service->find($id);
+
+            return Inertia::render(
+                'Backend/{{model}}/Form',
+                [
+                    'pageTitle' => fn () => '{{model}} Edit',
+                    'breadcrumbs' => fn () => [
+                        ['link' => null, 'title' => '{{model}} Manage'],
+                        ['link' => route('backend.{{routeName}}.edit', $id), 'title' => '{{model}} Edit'],
+                    ],
+                    '{{routeName}}' => fn () => ${{routeName}},
+                    'id' => fn () => $id,
+                ]
+            );
+        }
+
+        public function update({{model}}Request $request, $id)
+        {
+            DB::beginTransaction();
+            try {
+
+                $data = $request->validated();
+                ${{model}} = $this->{{variable}}Service->find($id);
+
+
+                $dataInfo = $this->{{variable}}Service->update($data, $id);
+
+                if ($dataInfo->save()) {
+                    $message = '{{model}} updated successfully';
+                    $this->storeAdminWorkLog($dataInfo->id, '{{table}}', $message);
+
+                    DB::commit();
+
+                    return redirect()
+                        ->back()
+                        ->with('successMessage', $message);
+                } else {
+                    DB::rollBack();
+
+                    $message = "Failed To update {{model}}.";
+                    return redirect()
+                        ->back()
+                        ->with('errorMessage', $message);
+                }
+            } catch (Exception $err) {
+                DB::rollBack();
+                $this->storeSystemError('Backend', '{{model}}controller', 'update', substr($err->getMessage(), 0, 1000));
+                DB::commit();
+                $message = "Server Errors Occur. Please Try Again.";
+                return redirect()
+                    ->back()
+                    ->with('errorMessage', $message);
+            }
+        }
+
+        public function destroy($id)
+        {
+
+            DB::beginTransaction();
+
+            try {
+
+                if ($this->{{variable}}Service->delete($id)) {
+                    $message = '{{model}} deleted successfully';
+                    $this->storeAdminWorkLog($id, '{{table}}', $message);
+
+                    DB::commit();
+
+                    return redirect()
+                        ->back()
+                        ->with('successMessage', $message);
+                } else {
+                    DB::rollBack();
+
+                    $message = "Failed To Delete {{model}}.";
+                    return redirect()
+                        ->back()
+                        ->with('errorMessage', $message);
+                }
+            } catch (Exception $err) {
+                DB::rollBack();
+                $this->storeSystemError('Backend', '{{model}}controller', 'destroy', substr($err->getMessage(), 0, 1000));
+                DB::commit();
+                $message = "Server Errors Occur. Please Try Again.";
+                return redirect()
+                    ->back()
+                    ->with('errorMessage', $message);
+            }
+        }
+
+    public function changeStatus()
+    {
+        DB::beginTransaction();
+
+        try {
+            $dataInfo = $this->{{variable}}Service->changeStatus(request());
+
+            if ($dataInfo->wasChanged()) {
+                $message = '{{model}} ' . request()->status . ' Successfully';
+                $this->storeAdminWorkLog($dataInfo->id, '{{table}}', $message);
+
+                DB::commit();
+
+                return redirect()
+                    ->back()
+                    ->with('successMessage', $message);
+            } else {
+                DB::rollBack();
+
+                $message = "Failed To " . request()->status . " {{model}}.";
+                return redirect()
+                    ->back()
+                    ->with('errorMessage', $message);
+            }
+        } catch (Exception $err) {
+            DB::rollBack();
+            $this->storeSystemError('Backend', '{{model}}Controller', 'changeStatus', substr($err->getMessage(), 0, 1000));
+            DB::commit();
+            $message = "Server Errors Occur. Please Try Again.";
+            return redirect()
+                ->back()
+                ->withErrors( ['error'=>$message]);
+        }
+    }
+}

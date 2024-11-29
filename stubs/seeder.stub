@@ -1,0 +1,29 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\{{model}};
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class {{model}}Seeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        foreach ($this->datas() as $key => $value) {
+            {{model}}::create($value);
+        }
+    }
+
+    private function datas()
+    {
+        return [
+            // dummy data array will be here
+        ];
+    }
+}
