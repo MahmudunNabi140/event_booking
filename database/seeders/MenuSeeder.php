@@ -57,36 +57,6 @@ class MenuSeeder extends Seeder
                 'status' => 'Active',
             ],
             [
-                'name' => 'User Manage',
-                'icon' => 'list',
-                'route' => null,
-                'description' => null,
-                'sorting' => 1,
-                'permission_name' => 'user-management',
-                'status' => 'Active',
-                'children' => [
-                    [
-                        'name' => 'User Add',
-                        'icon' => 'plus-circle',
-                        'route' => 'backend.admin.create',
-                        'description' => null,
-                        'sorting' => 1,
-                        'permission_name' => 'Admin-add',
-                        'status' => 'Active',
-                    ],
-                    [
-                        'name' => 'User List',
-                        'icon' => 'list',
-                        'route' => 'backend.admin.index',
-                        'description' => null,
-                        'sorting' => 1,
-                        'permission_name' => 'Admin-list',
-                        'status' => 'Active',
-                    ],
-                ],
-            ],
-
-            [
                 'name' => 'Event Manage',
                 'icon' => 'list',
                 'route' => null,
@@ -125,15 +95,15 @@ class MenuSeeder extends Seeder
                 'permission_name' => 'booking-management',
                 'status' => 'Active',
                 'children' => [
-                    [
-                        'name' => 'Booking Add',
-                        'icon' => 'plus-circle',
-                        'route' => 'backend.booking.create',
-                        'description' => null,
-                        'sorting' => 1,
-                        'permission_name' => 'booking-add',
-                        'status' => 'Active',
-                    ],
+                    // [
+                    //     'name' => 'Booking Add',
+                    //     'icon' => 'plus-circle',
+                    //     'route' => 'backend.booking.create',
+                    //     'description' => null,
+                    //     'sorting' => 1,
+                    //     'permission_name' => 'booking-add',
+                    //     'status' => 'Active',
+                    // ],
                     [
                         'name' => 'Booking List',
                         'icon' => 'list',
@@ -147,35 +117,7 @@ class MenuSeeder extends Seeder
             ],
 
 
-            [
-                'name' => 'Role Manage',
-                'icon' => 'layers',
-                'route' => null,
-                'description' => null,
-                'sorting' => 1,
-                'permission_name' => 'role-management',
-                'status' => 'Active',
-                'children' => [
-                    [
-                        'name' => 'Role Add',
-                        'icon' => 'plus-circle',
-                        'route' => 'backend.role.create',
-                        'description' => null,
-                        'sorting' => 1,
-                        'permission_name' => 'role-add',
-                        'status' => 'Active',
-                    ],
-                    [
-                        'name' => 'Role List',
-                        'icon' => 'list',
-                        'route' => 'backend.role.index',
-                        'description' => null,
-                        'sorting' => 1,
-                        'permission_name' => 'role-list',
-                        'status' => 'Active',
-                    ],
-                ],
-            ],
+            
 
 
         

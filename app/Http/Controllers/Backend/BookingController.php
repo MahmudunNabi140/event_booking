@@ -50,6 +50,7 @@ use Illuminate\Support\Facades\DB;
             ['fieldName' => 'index', 'class' => 'text-center'],
             ['fieldName' => 'user_id', 'class' => 'text-center'],
 			['fieldName' => 'event_id', 'class' => 'text-center'],
+			['fieldName' => 'seats', 'class' => 'text-center'],
             ['fieldName' => 'status', 'class' => 'text-center'],
         ];
     }
@@ -59,6 +60,7 @@ use Illuminate\Support\Facades\DB;
             'Sl/No',
             'User Name',
 			'Event Name',
+			'Seats',
             'Status',
             'Action'
         ];
@@ -79,6 +81,7 @@ use Illuminate\Support\Facades\DB;
             $customData->index = $index + 1;
             $customData->user_id = $data->user->name;
             $customData->event_id = $data->event->name;
+            $customData->seats = $data->seats;
             $customData->status = getStatusText($data->status);
             $customData->hasLink = true;
             $customData->links = [
