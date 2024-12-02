@@ -3,10 +3,10 @@
 
     use App\Http\Controllers\Controller;
     use App\Http\Requests\BookingRequest;
-use App\Services\AdminService;
-use App\Services\BookingService;
-use App\Services\EventService;
-use Illuminate\Support\Facades\DB;
+    use App\Services\AdminService;
+    use App\Services\BookingService;
+    use App\Services\EventService;
+    use Illuminate\Support\Facades\DB;
     use Illuminate\Http\Request;
     use Illuminate\Support\Str;
     use Illuminate\Support\Facades\Schema;
