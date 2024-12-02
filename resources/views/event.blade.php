@@ -14,12 +14,12 @@
 <div class="container">
     <div class="row">
         <div class="col-md-2 mt-5">
-           
+
             <div> <a href="{{route('frontend.events')}}">Events</a></div>
             <div> <a href="{{route('frontend.mybookinglist')}}">MyBookihgList</a></div>
             <div><a href="{{route('frontend.userLogout')}}">Logout</a></div>
-           
-            
+
+
         </div>
         <div class="col-md-10">
           <table class="table table-striped">
@@ -37,9 +37,9 @@
               </tr>
             </thead>
             <tbody>
-              @foreach ( $events as $event )
+              @foreach ( $events as $key=>$event )
               <tr>
-                <th scope="row">1</th>
+                <th scope="row">{{ $key+1 }}</th>
                 <td>{{$event->name}}</td>
                 <td>{{$event->description}}</td>
                 <td>{{$event->date}}</td>
@@ -51,8 +51,8 @@
 
               </tr>
               @endforeach
-           
-        
+
+
             </tbody>
           </table>
         </div>
